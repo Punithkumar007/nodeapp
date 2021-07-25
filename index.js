@@ -34,8 +34,5 @@ app.use("/poll", pollRouter);
 // /user/signup
 app.use("/user", userRouter);
 
-// '/poll/:id'
-// '/poll/name/:companyname'
-// post '/poll'
 
 app.listen(PORT, () => console.log("The server is started in ", PORT));
