@@ -1,82 +1,41 @@
+import dotenv from "dotenv";
 import express from "express";
 import { MongoClient } from "mongodb";
-import dotenv from 'dotenv';
+import { pollRouter } from "./routes/poll.js";
+import { userRouter } from "./routes/user.js";
+
+dotenv.config();
+//loaded in process.env
 
 const app = express();
 const PORT = process.env.PORT;
 
-dotenv.config();
+// middleware - transaltor
+// request -> parse json (body, post, put, patch) -> request.body
+app.use(express.json());
 
-async function createConnection() {
-
-    const MONGO_URL = process.env.MONGO_URI;
-    //Todo
-
-    const client = new MongoClient(MONGO_URL);
-    try {
-        await client.connect();
-        return client;
-        // getPollById(client, "4");
-    } catch (err) {
-        console.log(err);
-    }
+export async function createConnection() {
+  const MONGO_URL = process.env.MONGO_URI;
+  const client = new MongoClient(MONGO_URL);
+  try {
+    await client.connect();
+    return client;
+    // getPollById(client, "4");
+  } catch (err) {
+    console.log(err);
+  }
 }
-
-async function insertPoll(client, poll) {
-    const results = await client.db("constentants").collection('poll').insertMany(poll);
-    console.log("Inserted Successfully", results);
-}
-
-async function getPollById(client, id) {
-    const results = await client.db("constentants").collection('poll').findOne({ id: id });
-    console.log("Successfully Connected");
-    return results;
-}
-
-async function getPolls(client, filter) {
-    const results = await client.db("constentants").collection('poll').find({}).toArray();
-    console.log("Successfully Connected");
-    return results;
-}
-
-// async function getPollsByContent(client, content) {
-//     const results = await client.db("constentants").collection('poll').find({content:content.filter((data) => data.}).toArray();
-//     console.log("Successfully Connected");
-//     return results;
-// }
-createConnection();
 
 app.get("/", (request, response) => {
-    response.send("Welcome to my node app");
+  response.send("Welcome to my node app");
 });
 
-app.get("/poll", async (request, response) => {
+app.use("/poll", pollRouter);
+// /user/signup
+app.use("/user", userRouter);
 
-    const client = await createConnection();
-    const contestant = await getPolls(client, {});
-    response.send(contestant);
-});
-
-app.get("/poll/:id", async (request, response) => {
-    const id = request.params.id;
-
-    const client = await createConnection();
-    const contestant = await getPollById(client, id);
-    response.send(contestant);
-});
-
-app.get("/poll/name/:companyname", async (request, response) => {
-    const companyname = request.params.companyname;
-    const client = await createConnection();
-    const contestants = await getPolls(client, { company: companyname });
-    response.send(contestants);
-});
-
-app.get("/poll/content/:search", async (request, response) => {
-    const search = request.params.search;
-    const client = await createConnection();
-    const contestants = await getPolls(client, { content: { $regex: 'search', $options: 'i' } });
-    response.send(contestants);
-});
+// '/poll/:id'
+// '/poll/name/:companyname'
+// post '/poll'
 
 app.listen(PORT, () => console.log("The server is started in ", PORT));
