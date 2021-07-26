@@ -7,6 +7,7 @@ import { auth } from "../middleware/auth.js";
 
 const router = express.Router();
 
+// intercept -> If they have access
 // get all users
 router.route("/").get(auth, async (request, response) => {
   const client = await createConnection();
