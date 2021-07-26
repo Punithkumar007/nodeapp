@@ -3,7 +3,7 @@ import express from "express";
 import jwt from "jsonwebtoken";
 import { getUser, getUsers, insertUser } from "../helper.js";
 import { createConnection } from "../index.js";
-import {auth} from "../middleware/auth.js";
+import { auth } from "../middleware/auth.js";
 
 const router = express.Router();
 
